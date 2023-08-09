@@ -1,0 +1,12 @@
+Class,Identifiers,Address,Type,Initial Value,Comment
+VAR,PosCounter,HC202,COUNTER,0,Posição atual em pulsos
+VAR,CurrentPosition,D0,REAL,0,Posição (mm) atual do carro
+VAR,Resolution,D2,REAL,0,015,Resolução (mm/pulso) do motor
+VAR,PWMCycleTime,D4,DINT,1000,
+VAR,PWMOnTime,D6,DINT,,
+VAR,HandleIHMComm,,HandleIHMComm,,
+VAR,IHM_OUT_FirstWordIdentifier,D1000,WORD,,Flag de primeiro word do pacote TCP. Utilizado para validação de dados
+VAR,IHM_OUT_LastWordIdentifier,D1249,WORD,,Flag de ultimo word do pacote TCP. Utilizado para validação de dados
+VAR,IHM_IN_HeartBeat,D1250.0,BOOL,,"Sinal de vida da IHM, ON/OFF t = 1 s"
+VAR,IHMCommSendTimer,T0,TIMER,,Timer para cadenciar envio de dados a IHM
+VAR,IHMHeartBeatTimeout,T1,TIMER,,Timer responsável por verificar se a comunicação com a IHM foi perdida

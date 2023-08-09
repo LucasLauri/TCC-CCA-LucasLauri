@@ -1,0 +1,1 @@
+3|***|2023-08-07 17:31:52.2038|***|15556|***|1|***|INFO|***|HWCONFIG.Form_Main.SaveUserProject|***|Project saved successfully.\r\nProject directory: D:\.UFRGS\.TCC\TCC CCA - Lucas Lauri - PLC\TCC CCA LL 
