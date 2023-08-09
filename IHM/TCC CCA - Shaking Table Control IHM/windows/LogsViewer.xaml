@@ -1,0 +1,121 @@
+﻿<Window x:Class="LucasLauriHelpers.windows.LogsViewer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LucasLauriHelpers.windows"
+        xmlns:src="clr-namespace:LucasLauriHelpers.src"
+        mc:Ignorable="d"
+        Title="LogsViewer" Height="450" Width="800">
+    <Window.Resources>
+        <Style x:Key="LogItemBackground" TargetType="Rectangle">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding MessageType}" Value="Info">
+                    <Setter Property="Fill" Value="White"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MessageType}" Value="Warning">
+                    <Setter Property="Fill" Value="LightGoldenrodYellow"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MessageType}" Value="Error">
+                    <Setter Property="Fill" Value="LightSalmon"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding MessageType}" Value="Debug">
+                    <Setter Property="Fill" Value="LightSteelBlue"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="150"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Content="Topmost" IsChecked="{Binding LogsViewer.SetTopMost}"/>
+            <TextBlock Text="{Binding LogsViewer.CurrentFile, StringFormat=CurrentFile: {0}, FallbackValue=CurrentFile:}" Grid.Column="1"/>
+            <Button Content="Change file" Click="BtnChangeFile_Click" Grid.Column="2"/>
+        </Grid>
+
+        <!--Cabeçalho-->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Data"/>
+            <TextBlock Text="Method" Grid.Column="1"/>
+            <TextBlock Text="Evento" Grid.Column="2"/>
+            <TextBlock Text="Tipo" Grid.Column="3"/>
+
+            <ItemsControl ItemsSource="{Binding LogsViewer.MessageTypesView, FallbackValue=aaaa}" Grid.Row="1" Grid.ColumnSpan="99" HorizontalAlignment="Right">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:MessageTypesHolder}">
+                        <Grid>
+                            <CheckBox IsChecked="{Binding Checked}" Content="{Binding Type,FallbackValue=Type}" Margin="5,0"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+
+        <!--Logs-->
+        <ScrollViewer Grid.Row="2">
+            <ItemsControl ItemsSource="{Binding LogsViewer.LogItemsView}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type src:LogItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!--Cor do retangulo pelo binding do style-->
+                            <Rectangle Style="{StaticResource LogItemBackground}" Grid.ColumnSpan="99"/>
+
+                            <TextBlock Text="{Binding TimeStamp, StringFormat=HH:mm:ss.ffff dd/MM/yyyy}"/>
+                            <TextBlock Text="{Binding CallerMember}" TextWrapping="Wrap" Grid.Column="1"/>
+                            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Grid.Column="2"/>
+                            <TextBlock Text="{Binding MessageType}" Grid.Column="3"/>
+                            <Rectangle Fill="Black" Height="1" Grid.ColumnSpan="99" VerticalAlignment="Bottom"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!--Rodapé-->
+        <UniformGrid Rows="1" Grid.Row="99">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="LastUpdateDate: {0:HH\:mm\:ss.ffff} (Δt: {1:mm\.ffff})" FallbackValue="LastUpdateDate: HH:mm:ss.ffff (Δt: mm.ffff)" >
+                        <Binding Path="LogsViewer.LastUpdateViewDate"/>
+                        <Binding Path="LogsViewer.UpdateViewElapsedTime"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </UniformGrid>
+    </Grid>
+</Window>

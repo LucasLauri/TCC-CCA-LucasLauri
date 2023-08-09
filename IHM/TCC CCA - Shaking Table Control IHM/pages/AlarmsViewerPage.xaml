@@ -1,0 +1,415 @@
+﻿<Page x:Class="LucasLauriHelpers.pages.AlarmsViewerPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:LucasLauriHelpers.pages" 
+      xmlns:src="clr-namespace:LucasLauriHelpers.src" 
+      xmlns:customcontrols="clr-namespace:LucasLauriHelpers.customControls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AlarmsViewerPage" Loaded="Page_Loaded">
+
+
+    <Page.Resources>
+        <local:AlarmsIdsToIntConverter x:Key="AlarmsIdsToIntConverter"/>
+
+        <Style x:Key="TbCorpo" TargetType="TextBlock">
+            <!--<Setter Property="FontFamily" Value="/resources/fontes/#Roboto"/>-->
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="RecColorAlarm" TargetType="Rectangle">
+            <Setter Property="StrokeThickness" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.AllRight}">
+                    <Setter Property="Fill" Value="#008000"/>
+                    <Setter Property="Stroke" Value="Transparent"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState, FallbackValue={x:Static local:AlarmsViewerStates.None}}" Value="{x:Static local:AlarmsViewerStates.None}">
+                    <Setter Property="Fill" Value="#FF666666"/>
+                    <Setter Property="Stroke" Value="Transparent"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.Message}">
+                    <Setter Property="Fill" Value="#fb6c06"/>
+                    <Setter Property="Stroke" Value="Transparent"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.Alarm}">
+                    <Setter Property="Fill" Value="#ed1c24"/>
+                    <Setter Property="Stroke" Value="Transparent"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+
+        <Style x:Key="RecJointAlarm" TargetType="Rectangle">
+
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Fill" Value="#ed1c24"/>
+
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.AllRight}">
+                    <Setter Property="Fill" Value="#008000"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState, FallbackValue={x:Static local:AlarmsViewerStates.None}}" Value="{x:Static local:AlarmsViewerStates.None}">
+                    <Setter Property="Fill" Value="#FF666666"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.Message}">
+                    <Setter Property="Fill" Value="#fb6c06"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerState}" Value="{x:Static local:AlarmsViewerStates.Alarm}">
+                    <Setter Property="Fill" Value="#ed1c24"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RecBtnAlarm" TargetType="Rectangle" BasedOn="{StaticResource RecColorAlarm}">
+            <Setter Property="Margin" Value="0,-10,0,0"/>
+            <Setter Property="RadiusX" Value="10"/>
+            <Setter Property="RadiusY" Value="10"/>
+        </Style>
+
+        <Style x:Key="GridOverlayNoAlarm" TargetType="Grid">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.AllRight}">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerBlinkState, FallbackValue={x:Static local:AlarmsViewerStates.None}}" Value="{x:Static local:AlarmsViewerStates.None}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.Message}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.Alarm}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ImgAlarmIcon" TargetType="Path">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+
+            <!--Corpo mensagem-->
+            <Setter Property="Data">
+                <Setter.Value>
+                    M 0.16,25.55
+           C -0.14,24.46 0.94,22.80 0.97,22.90
+             0.97,22.90 12.46,2.02 12.46,2.02
+             12.46,2.02 13.32,-0.04 14.84,0.04
+             16.36,0.12 17.56,2.06 17.56,2.06
+             17.56,2.06 29.01,23.01 29.01,23.01
+             29.01,23.01 29.98,24.79 29.71,25.82
+             29.48,26.71 28.00,26.87 28.00,26.87
+             28.00,26.87 2.06,26.83 2.06,26.83
+             2.03,26.72 0.40,26.41 0.16,25.55 Z
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Fill" Value="#fb6c06"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding AlarmLevel,FallbackValue={x:Static src:AlarmsLevels.Message}}" Value="{x:Static src:AlarmsLevels.Alarm}">
+                    <Setter Property="Data">
+                        <!--Corpo alarme-->
+                        <Setter.Value>
+                            M 11.00,0.56
+           C 16.96,-0.47 22.29,0.31 26.44,5.19
+             33.44,13.41 29.58,26.68 19.00,29.44
+             0.57,34.26 -8.67,7.45 11.00,0.56 Z
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Fill" Value="#ed1c24"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ImgAlarmIconExclamation" TargetType="Path">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Fill" Value="Black"/>
+
+            <!--Exclamação mensagem-->
+            <Setter Property="Data">
+                <Setter.Value>M 15.08,8.21
+           C 15.08,8.17 14.91,18.87 14.91,18.87M 15.00,21.00
+           C 15.00,21.00 15.00,23.91 15.00,23.91
+                </Setter.Value>
+            </Setter>
+
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding AlarmLevel,FallbackValue={x:Static src:AlarmsLevels.Message}}" Value="{x:Static src:AlarmsLevels.Alarm}">
+                    <Setter Property="Data">
+                        <!--Exclamação alarme-->
+                        <Setter.Value>M 15.04,6.91
+           C 15.04,6.87 15.00,16.91 15.00,16.91M 15.04,19.09
+           C 15.04,19.09 15.00,22.87 15.00,22.87
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </Page.Resources>
+
+
+
+    <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:AlarmsViewerPage}}">
+        <Grid Margin="0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="300"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Rectangle Style="{StaticResource RecColorAlarm}" RadiusX="10" RadiusY="10" Grid.RowSpan="2" Margin="-1 -10 -1 0"/>
+
+            <Grid Margin="12" Background="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!--Cabeçalho-->
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                    </Grid.RowDefinitions>
+
+                    <Rectangle Fill="LightGray" Width="1" HorizontalAlignment="Right"/>
+                    <Rectangle Fill="LightGray" Width="1" Grid.Column="1" HorizontalAlignment="Right"/>
+                    <Rectangle Fill="LightGray" Width="1" Grid.Column="2" HorizontalAlignment="Right"/>
+                    <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Bottom" Grid.ColumnSpan="99"/>
+
+                    <TextBlock Text="Data" Style="{StaticResource TbCorpo}" Foreground="Black" VerticalAlignment="Center"/>
+                    <TextBlock Text="Nível" Style="{StaticResource TbCorpo}" Foreground="Black" Grid.Column="1" VerticalAlignment="Center"/>
+                    <TextBlock Text="Código" Style="{StaticResource TbCorpo}" Foreground="Black" Grid.Column="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="Mensagem" Style="{StaticResource TbCorpo}" Foreground="Black" Grid.Column="3" VerticalAlignment="Center"/>
+                </Grid>
+
+                <!--Alarmes-->
+                <ScrollViewer Grid.Row="1">
+                    <ItemsControl ItemsSource="{Binding CurrentAlarmsView}" d:ItemsSource="{Binding CurrentAlarmsView, FallbackValue=aaa}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type src:Alarm}">
+                                <Grid MouseDown="GridAlarm_MouseDown" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="250"/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="50"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition MinHeight="40"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Rectangle Fill="Transparent" Grid.ColumnSpan="99" Grid.RowSpan="99"/>
+                                    <!--Rectangle para a grid poder pegar os clicks em qualquer local-->
+
+                                    <Rectangle Fill="LightGray" Width="1" Grid.RowSpan="99" HorizontalAlignment="Right"/>
+                                    <Rectangle Fill="LightGray" Width="1" Grid.Column="1" Grid.RowSpan="99" HorizontalAlignment="Right"/>
+                                    <Rectangle Fill="LightGray" Width="1" Grid.Column="2" Grid.RowSpan="99" HorizontalAlignment="Right"/>
+                                    <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Bottom" Grid.Row="99"/>
+                                    <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Bottom" Grid.Column="1" Grid.ColumnSpan="99" Grid.Row="99"/>
+
+                                    <TextBlock Text="{Binding TimeStamp, StringFormat=dd/MM/yyyy HH:mm:ss, FallbackValue=dd/MM/yyyy HH:mm:ss}" Style="{StaticResource TbCorpo}" HorizontalAlignment="Center" Foreground="Black" VerticalAlignment="Center" Grid.RowSpan="2"/>
+
+                                    <Viewbox Grid.Column="1" DataContext="{Binding}" Margin="5">
+                                        <Grid>
+                                            <!--Corpo-->
+                                            <Path Style="{StaticResource ImgAlarmIcon}"/>
+                                            <!--Exclamação-->
+                                            <Path Style="{StaticResource ImgAlarmIconExclamation}"/>
+                                        </Grid>
+                                    </Viewbox>
+
+                                    <Grid Grid.Column="1" Grid.Row="1" Visibility="{Binding HelpVisibility}">
+                                        <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Top"/>
+                                        <TextBlock Text="{Binding AlarmLevel, FallbackValue=AlarmLevel}" Style="{StaticResource TbCorpo}" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    </Grid>
+
+                                    <TextBlock Text="{Binding Identifier, Converter={StaticResource AlarmsIdsToIntConverter}, FallbackValue=Cod}" Grid.Column="2" Style="{StaticResource TbCorpo}" Foreground="Black" VerticalAlignment="Center"/>
+                                    <Grid Grid.Column="2" Grid.Row="1" Visibility="{Binding HelpVisibility}">
+                                        <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Top"/>
+                                        <TextBlock Text="{Binding Identifier, FallbackValue=Identifier}" Style="{StaticResource TbCorpo}" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                    </Grid>
+
+
+                                    <TextBlock Text="{Binding Text, FallbackValue=Message}" Style="{StaticResource TbCorpo}" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center" Grid.Column="3"/>
+                                    <Grid Grid.Row="1" Grid.Column="3" Visibility="{Binding HelpVisibility}">
+                                        <Rectangle Fill="DarkGray" Height="1" VerticalAlignment="Top"/>
+                                        <TextBlock Text="{Binding HelpText, FallbackValue=HelpText}" TextWrapping="Wrap" Margin="20,5"/>
+                                    </Grid>
+
+                                    <Button Grid.Column="4" Grid.RowSpan="2" Focusable="True" Margin="2" Background="#ffc107" BorderBrush="Black" Click="BtnHelp_Click">
+                                        <Button.Content>
+                                            <TextBlock Text="?" FontSize="30" Padding="5" Foreground="Black" FontFamily="Tw Cen MT" FontWeight="Bold"/>
+                                        </Button.Content>
+                                    </Button>
+
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Grid Style="{StaticResource GridOverlayNoAlarm}" Grid.RowSpan="99">
+                    <Rectangle Fill="White"/>
+                    <TextBlock Text="Nenhum alarme ou mensagem ativo" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" FontFamily="/resources/fontes/#Roboto"/>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="10" Visibility="{Binding LastAlarmVisibility, FallbackValue=Collapsed}" MouseDown="BtnAlamrs_MouseDown" Height="50">
+
+
+                <Rectangle Fill="White" RadiusX="10" RadiusY="10" Grid.ColumnSpan="99" />
+
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Viewbox Grid.Column="0" DataContext="{Binding LastAlarm}">
+                        <Grid>
+                            <!--Corpo-->
+                            <Path Style="{StaticResource ImgAlarmIcon}"/>
+                            <!--Exclamação-->
+                            <Path Style="{StaticResource ImgAlarmIconExclamation}"/>
+                        </Grid>
+                    </Viewbox>
+                    <TextBlock Text="{Binding LastAlarm.Identifier, Converter={StaticResource AlarmsIdsToIntConverter}}" Grid.Column="1" Style="{StaticResource TbCorpo}" Foreground="Black" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding LastAlarm.Text}" Grid.Column="2"  Style="{StaticResource TbCorpo}" TextWrapping="Wrap" Foreground="Black" VerticalAlignment="Center"/>
+
+                    <customcontrols:CircleProgressView Grid.Column="3" Progress="{Binding PercentShowingAlarmTime}" Width="20" Height="20"/>
+
+                </Grid>
+            </Grid>
+
+            <Grid HorizontalAlignment="Left" Margin="10,0,0,0" Width="55" Height="55" MouseDown="BtnAlamrs_MouseDown" Grid.Row="2">
+
+                <Rectangle Style="{StaticResource RecBtnAlarm}"/>
+                <Viewbox Margin="5">
+                    <Grid>
+                        <!--Base-->
+                        <Path Fill="DarkGray">
+                            <Path.Data>
+                                M 13.17,63.13
+           C 13.17,63.13 51.04,62.74 51.04,62.74
+             51.04,62.74 47.39,53.65 47.39,53.65
+             47.39,53.65 16.13,53.78 16.13,53.78
+             16.13,53.78 13.17,63.13 13.17,63.13 Z
+                            </Path.Data>
+                        </Path>
+
+                        <!--Body-->
+                        <Path>
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Fill" Value="White"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.AllRight}">
+                                            <Setter Property="Fill" Value="LightGreen"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.Message}">
+                                            <Setter Property="Fill" Value="DarkOrange"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding AlarmsViewerBlinkState}" Value="{x:Static local:AlarmsViewerStates.Alarm}">
+                                            <Setter Property="Fill" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+
+                            <Path.Data>
+                                M 17.17,53.70
+           C 17.17,53.70 46.82,53.64 46.82,53.64
+             46.82,53.64 46.96,32.26 46.96,32.26
+             46.96,32.26 45.17,19.35 32.00,19.65
+             18.83,19.96 17.13,32.13 17.13,32.13
+             17.13,32.13 17.17,53.70 17.17,53.70 Z
+                            </Path.Data>
+                        </Path>
+
+                        <!--Exclamação-->
+                        <Path Fill="White">
+                            <Path.Data>
+                                M 32.06,43.56
+           C 29.81,43.69 29.49,45.53 29.49,45.53
+             29.17,46.94 30.51,48.07 31.88,48.06
+             32.77,48.06 34.46,48.00 34.48,45.66
+             34.33,44.94 34.12,43.62 32.06,43.56 Z
+           M 32.00,27.03
+           C 29.38,27.03 29.44,29.34 29.44,29.34
+             29.44,29.34 29.43,35.91 29.44,35.88
+             29.44,35.88 29.41,38.22 32.00,38.25
+             34.59,38.28 34.62,36.05 34.62,36.03
+             34.62,36.00 34.59,29.28 34.59,29.28
+             34.59,29.28 34.62,27.03 32.00,27.03 Z
+                            </Path.Data>
+                        </Path>
+
+                        <!--Stroke-->
+                        <Path Stroke="Black" StrokeThickness="2">
+                            <Path.Data>
+                                M 32.06,43.56
+           C 29.81,43.69 29.49,45.53 29.49,45.53
+             29.17,46.94 30.51,48.07 31.88,48.06
+             32.77,48.06 34.46,48.00 34.48,45.66
+             34.33,44.94 34.12,43.62 32.06,43.56 Z
+           M 32.00,27.03
+           C 29.38,27.03 29.44,29.34 29.44,29.34
+             29.44,29.34 29.44,35.88 29.44,35.88
+             29.44,35.88 29.41,38.22 32.00,38.25
+             34.59,38.28 34.62,36.05 34.62,36.03
+             34.62,36.00 34.59,29.28 34.59,29.28
+             34.59,29.28 34.62,27.03 32.00,27.03 Z
+           M 12.44,34.74
+           C 12.44,34.74 5.56,34.68 5.56,34.63M 2.11,34.58
+           C 2.11,34.58 0.18,34.62 0.18,34.62M 9.30,25.32
+           C 9.30,25.32 4.79,23.01 4.79,22.96M 14.92,17.56
+           C 14.92,17.51 7.71,10.51 7.71,10.51M 23.00,11.88
+           C 23.00,11.88 20.69,6.81 20.62,6.81M 32.07,14.56
+           C 32.04,14.53 32.02,12.44 32.02,12.44M 32.00,9.49
+           C 32.00,9.47 31.93,0.33 31.93,0.33M 41.02,12.04
+           C 41.02,12.04 43.98,6.98 43.98,6.98M 49.09,17.89
+           C 49.09,17.89 57.00,10.09 57.00,10.09M 54.07,25.96
+           C 54.07,25.96 60.11,23.04 60.11,23.04M 52.02,34.47
+           C 52.02,34.47 58.98,34.51 58.98,34.51M 62.00,34.53
+           C 62.00,34.51 63.87,34.56 63.87,34.53M 16.87,53.61
+           C 16.87,53.57 47.13,53.70 47.13,53.70
+             47.13,53.70 47.04,32.09 47.04,32.09
+             47.04,32.09 45.57,19.65 32.22,19.39
+             18.87,19.13 17.04,32.04 17.04,32.04
+             17.04,32.04 16.87,53.65 16.87,53.61 Z
+           M 16.86,53.62
+           C 16.86,53.62 13.35,62.61 13.35,62.61
+             13.35,62.61 50.87,62.48 50.87,62.48
+             50.87,62.48 47.12,53.70 47.12,53.70
+                            </Path.Data>
+                        </Path>
+                    </Grid>
+                </Viewbox>
+                <Rectangle Style="{StaticResource RecJointAlarm}"  Height="10" Margin="1,-10,1,0"/>
+            </Grid>
+
+
+        </Grid>
+
+    </Grid>
+</Page>

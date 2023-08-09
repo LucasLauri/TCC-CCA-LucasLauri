@@ -1,0 +1,154 @@
+﻿<UserControl x:Class="LucasLauriHelpers.customControls.GraphView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LucasLauriHelpers.customControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="OkButton" TargetType="Button">
+            <Setter Property="Background" Value="#00a551"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="1"/>
+        </Style>
+
+        <Style x:Key="TextButton" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Yu Gothic UI Semibold"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:GraphView}}">
+
+        <Rectangle Fill="White" RadiusX="5" RadiusY="5"/>
+
+        <Grid Margin="5">
+            <Canvas x:Name="GraphCanvas" RenderTransformOrigin="0.5,0.5" ClipToBounds="True" Background="Transparent"
+                MouseWheel="GraphCanvas_MouseWheel" MouseDown="GraphCanvas_MouseDown" MouseUp="MouseUp_GraphCanvas" MouseEnter="MouseEnter_GraphCanvas" MouseLeave="MouseLeave_GraphCanvas" MouseMove="MouseMove_GraphCanvas" >
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleY="-1"/>
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+            </Canvas>
+
+            <Canvas>
+                <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="{Binding GrahpOptionsVisibility, FallbackValue=Visible}" Margin="{Binding GraphOptionsMargin}">
+                    <StackPanel x:Name="GraphOptions" RenderTransformOrigin="0.5,0.5">
+                        <Button Content="Centralizar" Click="BtnFitData_Click"/>
+                        <Button Content="Centralizar (1x1)" Click="BtnFitSqueraData_Click"/>
+                    </StackPanel>
+                </Canvas>
+            </Canvas>
+
+            <TextBlock Text="Nenhum dado a ser apresentado" IsHitTestVisible="False" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="DemiBold" Opacity="0.5" FontSize="30" d:Visibility="Visible">
+                <TextBlock.Style>
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding GraphDatasCount}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <Expander Header="Curvas" Margin="20" VerticalAlignment="Top" HorizontalAlignment="Left" IsExpanded="{Binding IsDataMenuExpanded}" BorderBrush="Black" BorderThickness="1" Background="White" Padding="3">
+                <StackPanel>
+                    <ItemsControl ItemsSource="{Binding GraphDatasView}" d:ItemsSource="{Binding GraphDatas,FallbackValue=aaa}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <UniformGrid Rows="1">
+                                    <TextBlock Text="{Binding Id}" d:Text="Data"/>
+                                    <Rectangle Width="15" Height="15" Stroke="Black">
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush x:Name="CurrentColorFill" Color="{Binding Color}" d:Color="Purple"/>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <CheckBox Content="View" IsChecked="{Binding Enabled}" Click="ViewCheckBox_Click"/>
+                                </UniformGrid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Expander>
+
+            <UniformGrid HorizontalAlignment="Right" VerticalAlignment="Top" Background="White" Margin="20" Rows="1">
+                
+                <!--Botão para baixar dados do gráfico-->
+                <Grid>
+                    <Rectangle Fill="White" RadiusX="3" RadiusY="3"/>
+                    <Button Content="Salvar" Click="BtnDownloadData_Click" Height="30"/>
+                </Grid>
+                
+                <!--Botão para expandir o gráfico-->
+                <!--<Grid MouseDown="BtnExpand_MouseDown">
+                    <Rectangle Fill="White" RadiusX="3" RadiusY="3"/>
+                    <Image Width="40" Margin="5">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Setter Property="Source" Value="/resources/expand.png"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsExpanded}" Value="true">
+                                        <Setter Property="Source" Value="/resources/collapse.png"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </Grid>-->
+            </UniformGrid>
+            
+            <Grid IsHitTestVisible="False" VerticalAlignment="Bottom">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding MouseState}" Value="Idle">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding GraphDatasCount}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="Ponto: {0:F3} ; {1:F3}" FallbackValue="Ponto: 0.000 ; 0.000">
+                            <Binding Path="MouseDataPoint.X"/>
+                            <Binding Path="MouseDataPoint.Y"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </Grid>
+
+            <!--UniformGrid de DEBUG não precisar mudar o layout-->
+            <UniformGrid Rows="1" IsHitTestVisible="False" VerticalAlignment="Top" Opacity="0.5">
+                <UniformGrid.Style>
+                    <Style TargetType="UniformGrid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Program.DebugMode}" Value="false">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </UniformGrid.Style>
+                <TextBlock Text="{Binding RefreshViewsDeltaTime, StringFormat=Δt: {0:mm\\:ss\\.ffff}, FallbackValue=00:00.0000}"/>
+                <TextBlock Text="{Binding TickStep, StringFormat=Tick: {0:F3}, FallbackValue=Tick: 0.000}"/>
+                <TextBlock Text="{Binding Scale, StringFormat=Scale: {0:F3}, FallbackValue=Scale: 0.000}"/>
+                <TextBlock Text="{Binding MouseState, StringFormat=MouseState: {0}, FallbackValue=MouseState: Idle}"/>
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="InitialMousePosition: {0:F3} {1:F3}">
+                            <Binding Path="InitialMousePosition.X"/>
+                            <Binding Path="InitialMousePosition.Y"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </UniformGrid>
+        </Grid>
+    </Grid>
+</UserControl>
